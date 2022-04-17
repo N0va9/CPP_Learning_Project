@@ -81,13 +81,13 @@ private:
     void draw_point(Coordinate coordinate, const Point2D& screen_pos, const Point2D& screen_dim,
                     const size_t tile_idx) const
     {
-        const auto& tex_shift    = _texture_shifts[coordinate];
-        const auto& screen_shift = _screen_shifts[coordinate];
+        auto& tex_shift    = _texture_shifts[coordinate];
+        auto& screen_shift = _screen_shifts[coordinate];
 
         glTexCoord2f((tile_idx + tex_shift.x()) * tile_width, tex_shift.y());
 
         const auto vertex = screen_pos + screen_dim * screen_shift * 0.5f;
-        glVertex2fv(vertex.values);
+        glVertex2fv(vertex.values.data());
     }
 };
 
