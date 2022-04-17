@@ -4,7 +4,7 @@
 
 ### A - Structured Bindings
 
-`TowerSimulation::display_help()` est chargé de l'affichage des touches disponibles.
+`TowerSimulation::display_help()` (`tower_sim.cpp`) est chargé de l'affichage des touches disponibles.
 Dans sa boucle, remplacez `const auto& ks_pair` par un structured binding adapté.
 
 Si vous ne savez plus ce qu'est un structured binding, le [chapitre 6](https://laefy.github.io/CPP_Learning/chapter6/1-searches/) est votre ami (Google aussi d'ailleurs).
@@ -19,7 +19,7 @@ Remplacez votre boucle avec un appel à `std::remove_if`.
 
 2. Pour des raisons de statistiques, on aimerait bien être capable de compter tous les avions de chaque airline.
 A cette fin, rajoutez des callbacks sur les touches `0`..`7` de manière à ce que le nombre d'avions appartenant à `airlines[x]` soit affiché en appuyant sur `x`.
-Rendez-vous compte de quelle classe peut acquérir cet information. Utilisez la bonne fonction de `<algorithm>` pour obtenir le résultat.
+Rendez-vous compte de quelle classe peut acquérir cet information (`aircraft_factory.hpp`). Utilisez la bonne fonction de `<algorithm>` pour obtenir le résultat.
 
 ### C - Relooking de Point3D
 

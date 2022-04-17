@@ -60,3 +60,19 @@ void Tower::arrived_at_terminal(const Aircraft& aircraft)
 {
     airport.get_terminal(reserved_terminals[&aircraft]).start_service(aircraft);
 }
+
+WaypointQueue Tower::reserve_terminal(Aircraft& aircraft) {
+    auto res = airport.reserve_terminal(aircraft);
+
+    if (res.first.empty()) { reserved_terminals[&aircraft] = res.second; }
+
+    return res.first;
+}
+
+void Tower::destroy(Aircraft& aircraft){
+    auto val = reserved_terminals.find(&aircraft);
+    if (reserved_terminals.end() != val ){
+        airport.get_terminal(val->second).free();
+        reserved_terminals.erase(val);
+    }
+}

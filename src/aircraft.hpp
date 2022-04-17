@@ -10,17 +10,23 @@
 #include <string>
 #include <string_view>
 
+#include <ctime>
+#include <random>
+
+using namespace std;
+
 class Aircraft : public GL::Displayable, public GL::DynamicObject
 {
 private:
     const AircraftType& type;
-    const std::string flight_number;
+    const string flight_number;
     Point3D pos, speed; // note: the speed should always be normalized to length 'speed'
     WaypointQueue waypoints = {};
     Tower& control;
     bool landing_gear_deployed = false; // is the landing gear deployed?
     bool is_at_terminal        = false;
     bool cycle_finished        = false;
+    int fuel;
 
     // turn the aircraft to arrive at the next waypoint
     // try to facilitate reaching the waypoint after the next by facing the
@@ -46,23 +52,40 @@ private:
     Aircraft& operator=(const Aircraft&) = delete;
 
 public:
-    Aircraft(const AircraftType& type_, const std::string_view& flight_number_, const Point3D& pos_,
+    Aircraft(const AircraftType& type_, const string_view& flight_number_, const Point3D& pos_,
              const Point3D& speed_, Tower& control_) :
         GL::Displayable { pos_.x() + pos_.y() },
         type { type_ },
         flight_number { flight_number_ },
         pos { pos_ },
         speed { speed_ },
-        control { control_ }
+        control { control_ },
+        fuel { (rand() % 2850) + 150 }
     {
         speed.cap_length(max_speed());
+        srand(time(nullptr));
     }
 
-    const std::string& get_flight_num() const { return flight_number; }
+    ~Aircraft() {
+        control.destroy(*this);
+    }
+
+    const string& get_flight_num() const { return flight_number; }
     float distance_to(const Point3D& p) const { return pos.distance_to(p); }
+    bool has_terminal() const { return !waypoints.empty() && waypoints.back().is_at_terminal(); };
+    bool is_circling() const { return !waypoints.empty() && !cycle_finished && !has_terminal(); };
+    int fuel_remaining() const { return fuel; };
+    bool is_low_on_fuel() const { return fuel < 200; };
+    void refill(int& fuel_stock) {
+        auto fuelToRefill = std::min(fuel_stock, 3000 - fuel);
+        fuel_stock -= fuelToRefill;
+        fuel += fuelToRefill;
+        if (fuelToRefill != 0) std::cout <<"The aircraft "<< flight_number << " got refilled by " << fuelToRefill << " L of fuel" << std::endl;
+    }
 
     void display() const override;
     bool move() override;
+    bool has_cycle_finished() const;
 
     friend class Tower;
 };

@@ -90,6 +90,17 @@ void Aircraft::add_waypoint(const Waypoint& wp, const bool front)
 
 bool Aircraft::move()
 {
+    fuel--;
+    if (fuel == 0) {
+        std::cout << "Running out of fuel" << std::endl;
+        return true;
+    }
+
+    if (is_circling()) {
+        WaypointQueue wp = control.reserve_terminal(*this);
+        if (!wp.empty()) { waypoints = std::move(wp); }
+    }
+
     if (waypoints.empty())
     {
         if (cycle_finished) {
@@ -148,4 +159,4 @@ void Aircraft::display() const
     type.texture.draw(project_2D(pos), { PLANE_TEXTURE_DIM, PLANE_TEXTURE_DIM }, get_speed_octant());
 }
 
-
+bool Aircraft::has_cycle_finished() const { return cycle_finished; };

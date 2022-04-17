@@ -13,35 +13,32 @@ public:
         // 1. créer l'avion avec make_unique
         auto avion_ptr = std::move(aircraft);
         // 2. rajouter l'avion dans la liste des avions avec aircrafts.emplace
-        aircrafts.emplace(std::move(avion_ptr));
+        aircrafts.emplace_back(std::move(avion_ptr));
     }
 
     bool move() override
     {
-        for (auto it = aircrafts.begin();
-             it != aircrafts.end();) // Notez bien le manque de l'increment ++it ici car on va incrementer it
-                                     // selon la réponse de move()
-        {
-            if ((*it)->move())
-            {
-                // ************* déjà fait TASK0 exo 5
-                //          display_queue.erase(*it);   // n'oubliez pas d'enlever l'objet de la
-                //          display_queue; (5) Faites en sort que ceci est fait automatiquement (par le
-                //          destructeur)
-                // *************
+        std::sort(aircrafts.begin(), aircrafts.end(), [](const std::unique_ptr<Aircraft>& a1, const std::unique_ptr<Aircraft>& a2) {
+            if (a2 -> has_terminal() && !a1 -> has_terminal()) { return false; }
+            if (a1 -> has_terminal() && !a2 -> has_terminal()) { return true; }
 
-                // ***** gestion automatique par le destructeur de std::unqiue_ptr
-                //          delete *it;                 // c'est pas bien, mais nécessaire parce qu'on a créé
-                //          l'avion via new.... cela change dès qu'on trouve un propre owner des avions
-                //          (TASK1)
-                it = aircrafts.erase(it); // ici, on enleve *it de aircrafts d'une facon safe
-            }
-            else
-                ++it;
-        }
+            return a1->fuel_remaining() < a2->fuel_remaining();
+        });
+
+        auto aircraftsToDelete = std::remove_if(aircrafts.begin(), aircrafts.end(), [](const auto& it) {return it->move(); });
+        aircrafts.erase(aircraftsToDelete, aircrafts.end());
         return true;
     }
 
+    int get_required_fuel() const {
+        return std::accumulate(aircrafts.begin(), aircrafts.end(), 0, [](int acc, const std::unique_ptr<Aircraft>& actual_aircraft){
+           if (actual_aircraft -> has_cycle_finished() || !actual_aircraft->is_low_on_fuel()){
+               return acc;
+           }
+           return 3000 + acc - actual_aircraft->fuel_remaining();
+        });
+    }
+
 private:
-    std::set<std::unique_ptr<Aircraft>> aircrafts;
+    std::vector<std::unique_ptr<Aircraft>> aircrafts;
 };

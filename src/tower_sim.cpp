@@ -2,6 +2,7 @@
 
 #include "GL/opengl_interface.hpp"
 #include "airport.hpp"
+#include "aircraft.hpp"
 #include "config.hpp"
 #include "img/image.hpp"
 #include "img/media_path.hpp"
@@ -32,15 +33,27 @@ void TowerSimulation::create_keystrokes() {
 
     GL::keystrokes.emplace('u', []() { GL::up_ticks_per_seconds(); });
     GL::keystrokes.emplace('d', []() { GL::down_ticks_per_seconds(); });
+
+    for(int i = 0; i < 8; i++ ){
+        GL::keystrokes.emplace(i + '0', [this, i]() {aircraftFactory.printFlightNumberInfoAtIndex(i); });
+    }
+
+
 }
 
 void TowerSimulation::display_help() {
     std::cout << "This is an airport tower simulator" << std::endl
               << "the following keysstrokes have meaning:" << std::endl;
 
+    /* Sans Structured Binding
     for (const auto& ks_pair : GL::keystrokes)
     {
         std::cout << ks_pair.first << ' ';
+    }*/
+
+    //Avec Structured Binding
+    for (const auto& [key, _] : GL::keystrokes) {
+        std::cout << key << ' ';
     }
 
     std::cout << std::endl;
@@ -48,7 +61,7 @@ void TowerSimulation::display_help() {
 
 void TowerSimulation::init_airport()
 {
-    airport = new Airport { one_lane_airport, Point3D { 0, 0, 0 },
+    airport = new Airport { aircraftManager, one_lane_airport , Point3D { 0, 0, 0 },
                             new img::Image { one_lane_airport_sprite_path.get_full_path() } };
 
     GL::Displayable::display_queue.emplace_back(airport);
