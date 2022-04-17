@@ -57,6 +57,11 @@ void TowerSimulation::create_keystrokes() const
     GL::keystrokes.emplace('+', []() { GL::change_zoom(0.95f); });
     GL::keystrokes.emplace('-', []() { GL::change_zoom(1.05f); });
     GL::keystrokes.emplace('f', []() { GL::toggle_fullscreen(); });
+
+    GL::keystrokes.emplace('p', []() { GL::toggle_pause(); });
+
+    GL::keystrokes.emplace('u', []() { GL::up_ticks_per_seconds(); });
+    GL::keystrokes.emplace('d', []() { GL::down_ticks_per_seconds(); });
 }
 
 void TowerSimulation::display_help() const
@@ -77,7 +82,7 @@ void TowerSimulation::init_airport()
     airport = new Airport { one_lane_airport, Point3D { 0, 0, 0 },
                             new img::Image { one_lane_airport_sprite_path.get_full_path() } };
 
-    GL::display_queue.emplace_back(airport);
+    GL::Displayable::display_queue.emplace_back(airport);
     GL::move_queue.emplace(airport);
 }
 

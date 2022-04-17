@@ -88,10 +88,14 @@ void Aircraft::add_waypoint(const Waypoint& wp, const bool front)
     }
 }
 
-void Aircraft::move()
+bool Aircraft::move()
 {
     if (waypoints.empty())
     {
+        if (cycle_finished) {
+            return true;
+        }
+
         waypoints = control.get_instructions(*this);
     }
 
@@ -101,7 +105,7 @@ void Aircraft::move()
         // move in the direction of the current speed
         pos += speed;
 
-        // if we are close to our next waypoint, stike if off the list
+        // if we are close to our next waypoint, strike if off the list
         if (!waypoints.empty() && distance_to(waypoints.front()) < DISTANCE_THRESHOLD)
         {
             if (waypoints.front().is_at_terminal())
@@ -136,9 +140,12 @@ void Aircraft::move()
         // update the z-value of the displayable structure
         GL::Displayable::z = pos.x() + pos.y();
     }
+    return false;
 }
 
 void Aircraft::display() const
 {
     type.texture.draw(project_2D(pos), { PLANE_TEXTURE_DIM, PLANE_TEXTURE_DIM }, get_speed_octant());
 }
+
+
