@@ -6,7 +6,9 @@ La création des avions est aujourd'hui gérée par les fonctions `TowerSimulati
 Chaque avion créé est ensuite placé dans les files `GL::display_queue` et `GL::move_queue`.
 
 Imaginez et décrivez ce que vous devriez faire si vous souhaitiez accéder à l'avion ayant le numéro de vol "AF1250".
-
+___
+J'utiliserai la fonction `std::find_if()` pour parcourir la liste des avions correspondant au numéro de vol donné.
+___
 ---
 
 ## Objectif 1 - Référencement des avions
@@ -20,9 +22,20 @@ Vous avez 2 choix possibles :
 - donner ce rôle à une classe existante.
 
 Réfléchissez aux pour et contre de chacune de ces options.
+___
+1ère option :
+<ol> 
+<ul>Avantages : Respecte le fait d'avoir un rôle par classe, s'il y a un problème on sait où chercher</ul>
+<ul>Inconvénient : Création d'une nouvelle classe</ul>
+</ol>
+
+2ème option :
+<ol> 
+<ul>Avantage et inconvénient : Modification du code existant</ul>
+</ol>
 
 Pour le restant de l'exercice, vous partirez sur le premier choix.
-
+___
 ### B - Déterminer le propriétaire de chaque avion
 
 Vous allez introduire une nouvelle liste de références sur les avions du programme.
@@ -30,16 +43,36 @@ Il serait donc bon de savoir qui est censé détruire les avions du programme, a
 
 Répondez aux questions suivantes :
 1. Qui est responsable de détruire les avions du programme ? (si vous ne trouvez pas, faites/continuez la question 4 dans TASK_0)
+___
+La méthode `timer()` est responsable de détruire les avions du programme.
+___
 2. Quelles sont les listes qui contiennent une référence sur un avion au moment où il doit être détruit ?
+___
+Les listes qui contiennent une référence sur un avion au moment où il doit être détruit sont `display_queue` et `move_queue`.
+___
 3. Comment fait-on pour supprimer la référence sur un avion qui va être détruit dans ces deux structures ?
-
+___
+`display_queue` -> destructeur de l'interface `Displayable` sur l'avion récupéré via `std::find`
+<br>
+`move_queue`    -> via parcours de la liste
+___
 Pour simplifier le programme, l'`AircraftManager` aura l'ownership des avions, c'est-à-dire que c'est lui qui s'occupera de les faire disparaître du programme, et non plus la fonction `timer`. Il aura également la responsabilité de les faire bouger.
 
 ### C - C'est parti !
 
 Ajoutez un attribut `aircrafts` dans le gestionnaire d'avions.
 Choisissez un type qui met bien en avant le fait que `AircraftManager` est propriétaire des avions, et vérifiez avec votre chargé de TP qu'il s'agit de la bonne solution.
+___
+`std::unordered_map<std::string, Aircraft> aircrafts` ou bien `std::unordered_map<std::string, std::unique_ptr<Aircraft>> aircrafts`<br>
+`std::unordered_set<Aircraft>` (pas hashable)<br>
+`std::set<Aircraft>` (Aircraft sont pas comparable)<br>
+`std::unordered_set<std::unique_ptr<Aircraft>>`<br>
+`std::set<std::unique_ptr<Aircraft>>` aussi possible<br>
+new ---> make_unique<br>
+delete --> n'est pas nécessaire
 
+Je choisis `std::set<std::unique_ptr<Aircraft>>`
+___
 Ajoutez un nouvel attribut `aircraft_manager` dans la classe `TowerSimulation`.
 
 La fonction `timer` est implémentée dans la partie GL/ du programme. Celle-ci est complètement indépendente du contenu de l'application, c'est-à-dire qu'elle ne connaît pas les types `Aircraft`, `Airport`, etc.\
