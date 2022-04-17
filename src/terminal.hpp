@@ -21,11 +21,15 @@ public:
 
     bool in_use() const { return current_aircraft != nullptr; }
     bool is_servicing() const { return current_aircraft->is_low_on_fuel() || service_progress < SERVICE_CYCLES; }
-    void assign_craft(Aircraft& aircraft) { current_aircraft = &aircraft; }
+    void assign_craft(Aircraft& aircraft) {
+        assert(&aircraft);
+        current_aircraft = &aircraft;
+    }
 
     void start_service(const Aircraft& aircraft)
     {
-        assert(aircraft.distance_to(pos) < DISTANCE_THRESHOLD);
+        //assert(aircraft.distance_to(pos) < DISTANCE_THRESHOLD);
+        assert(&aircraft);
         std::cout << "now servicing " << aircraft.get_flight_num() << "...\n";
         service_progress = 0;
     }
@@ -53,6 +57,7 @@ public:
     }
 
     void refill_if_needed(int& fuel_stock) {
+        assert(fuel_stock);
         if(!in_use())
             return ;
         if (current_aircraft->is_low_on_fuel())

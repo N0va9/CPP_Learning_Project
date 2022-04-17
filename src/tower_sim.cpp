@@ -34,6 +34,8 @@ void TowerSimulation::create_keystrokes() {
     GL::keystrokes.emplace('u', []() { GL::up_ticks_per_seconds(); });
     GL::keystrokes.emplace('d', []() { GL::down_ticks_per_seconds(); });
 
+    GL::keystrokes.emplace('m', [this]() { aircraftManager.print_nb_crashs(); });
+
     for(int i = 0; i < 8; i++ ){
         GL::keystrokes.emplace(i + '0', [this, i]() {aircraftFactory.printFlightNumberInfoAtIndex(i); });
     }

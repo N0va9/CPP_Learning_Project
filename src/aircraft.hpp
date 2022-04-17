@@ -71,7 +71,7 @@ public:
     }
 
     const string& get_flight_num() const { return flight_number; }
-    float distance_to(const Point3D& p) const { return pos.distance_to(p); }
+    float distance_to(const Point3D& p) const {return pos.distance_to(p); }
     bool has_terminal() const { return !waypoints.empty() && waypoints.back().is_at_terminal(); };
     bool is_circling() const { return !waypoints.empty() && !cycle_finished && !has_terminal(); };
     int fuel_remaining() const { return fuel; };
@@ -81,6 +81,7 @@ public:
         fuel_stock -= fuelToRefill;
         fuel += fuelToRefill;
         if (fuelToRefill != 0) std::cout <<"The aircraft "<< flight_number << " got refilled by " << fuelToRefill << " L of fuel" << std::endl;
+        assert(fuel_stock >= 0 && fuel > 0);
     }
 
     void display() const override;

@@ -17,6 +17,7 @@ class AircraftFactory {
         ~AircraftFactory()= default;
 
         unique_ptr<Aircraft> create_random_aircraft(Airport* airport) {
+            assert(airport);
             return create_aircraft(*(aircraft_types[rand() % 3]), airport);
         }
 
@@ -45,7 +46,7 @@ class AircraftFactory {
 
         unique_ptr<Aircraft> create_aircraft(const AircraftType& type, Airport* airport) {
             assert(airport); // make sure the airport is initialized before creating aircraft
-
+            assert(&type);
             //To have an unique flight number
             string flight_number;
             do {

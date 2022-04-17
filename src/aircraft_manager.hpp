@@ -10,6 +10,7 @@ class AircraftManager : public GL::DynamicObject
 public:
     void add_aircraft(std::unique_ptr<Aircraft> aircraft)
     {
+        assert(aircraft);
         // 1. créer l'avion avec make_unique
         auto avion_ptr = std::move(aircraft);
         // 2. rajouter l'avion dans la liste des avions avec aircrafts.emplace
@@ -25,7 +26,17 @@ public:
             return a1->fuel_remaining() < a2->fuel_remaining();
         });
 
-        auto aircraftsToDelete = std::remove_if(aircrafts.begin(), aircrafts.end(), [](const auto& it) {return it->move(); });
+        auto aircraftsToDelete = std::remove_if(aircrafts.begin(), aircrafts.end(), [this](const auto& it) {
+                                                    try {
+                                                        return it->move();
+                                                    } catch (const AircraftCrash& e) {
+                                                        std::cerr<< e.what() <<std::endl;
+                                                        cpt_deaths++;
+                                                        return true;
+                                                    }
+                                                });
+
+
         aircrafts.erase(aircraftsToDelete, aircrafts.end());
         return true;
     }
@@ -39,6 +50,11 @@ public:
         });
     }
 
+    void print_nb_crashs() {
+        std::cout <<"They are actually "<< cpt_deaths << " aircrafts crashed." << std::endl;
+    }
+
 private:
     std::vector<std::unique_ptr<Aircraft>> aircrafts;
+    int cpt_deaths = 0;
 };

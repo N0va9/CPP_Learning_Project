@@ -92,8 +92,7 @@ bool Aircraft::move()
 {
     fuel--;
     if (fuel == 0) {
-        std::cout << "Running out of fuel" << std::endl;
-        return true;
+        throw AircraftCrash {"The aircraft number "+ flight_number + " ran out of fuel"};
     }
 
     if (is_circling()) {
